@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JEWTARDIO WORLD ORDER</title>
+    <style>
+        /* --- 1. GLOBAL & RESET --- */
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0; padding: 0;
+            background-color: #000;
+            font-family: "Courier New", Courier, monospace;
+            overflow-x: hidden;
+            color: #000;
+            padding-bottom: 120px; /* Space for Winamp */
+            /* RETRO CURSOR */
+            cursor: url('https://cur.cursors-4u.net/others/oth-6/oth609.cur'), auto; 
+        }
+
+        /* --- CRT SCANLINE OVERLAY --- */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 9999;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* --- FONT SETTINGS --- */
+        @font-face {
+            font-family: 'MarioFont';
+            src: url('super_mario_256/SuperMario256.ttf') format('truetype');
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes rainbow-flash {
+            0% { color: #ff0000; } 15% { color: #ff9900; } 30% { color: #ffff00; }
+            45% { color: #33ff00; } 60% { color: #0099ff; } 75% { color: #6633ff; }
+            90% { color: #ff00ff; } 100% { color: #ff0000; }
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        /* --- HEADER & TEXT --- */
+        .logo-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .mario-text {
+            font-family: 'MarioFont', sans-serif;
+            font-size: clamp(2rem, 13vw, 4rem); 
+            text-shadow: 4px 4px 0px #000;
+            letter-spacing: 0px;
+            text-transform: uppercase;
+            -webkit-text-stroke: 1.5px black;
+            display: flex;
+            flex-wrap: wrap; 
+            justify-content: center;
+            /* RAINBOW ANIMATION APPLIED */
+            animation: rainbow-flash 0.5s linear infinite;
+        }
+
+        /* Letter Colors (Fallback) */
+        .l-blue { color: #0099db; } .l-yellow { color: #fbd000; } 
+        .l-red { color: #e52521; } .l-green { color: #43b047; }
+
+        /* --- IMAGES --- */
+        img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            image-rendering: pixelated;
+        }
+
+        canvas#matrix {
+            display: block; position: fixed; top: 0; left: 0; z-index: -1;
+        }
+
+        /* --- LAYOUT CONTAINER --- */
+        .desktop {
+            display: flex; flex-direction: column; align-items: center;
+            width: 100%; max-width: 480px; 
+            margin: 0 auto; padding: 20px 10px; gap: 15px;
+            position: relative; z-index: 1;
+        }
+
+        /* --- WINDOWS 95 UI SYSTEM --- */
+        .win95-window {
+            width: 100%;
+            background-color: #c0c0c0;
+            border: 2px solid;
+            border-color: #dfdfdf #0a0a0a #0a0a0a #dfdfdf;
+            box-shadow: 2px 2px 0px #000;
+            padding: 2px;
+        }
+
+        .title-bar {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            padding: 4px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px;
+        }
+        .title-text { color: white; font-weight: bold; font-size: 14px; display: flex; align-items: center; gap: 5px; }
+        .window-controls { display: flex; gap: 2px; }
+        .win-btn {
+            width: 16px; height: 14px; background: #c0c0c0;
+            border: 1px solid; border-color: #fff #808080 #808080 #fff;
+            font-size: 10px; line-height: 10px; text-align: center; cursor: pointer; padding: 0;
+            cursor: url('https://cur.cursors-4u.net/others/oth-6/oth609.cur'), pointer;
+        }
+
+        /* --- MAIN WINDOW CONTENT (Your Vertical Layout) --- */
+        .window-content-main {
+            min-height: 500px; 
+            background-color: white; 
+            background-size: cover;
+            border: 2px solid; border-color: #808080 #fff #fff #808080;
+            gap: 20px;
+            /* VERTICAL STACK */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .main-hero-img {
+            width: 70%; 
+            margin: 0 auto;
+            mix-blend-mode: multiply; /* Fixes white box around JPG */
+        }
+        
+        .link-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            z-index: 2;
+            justify-content: center;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .btn-row { display: flex; gap: 5px; }
+
+        .retro-button {
+            flex: 1;
+            background: #c0c0c0; color: blue; font-weight: bold;
+            text-decoration: none; text-align: center;
+            font-size: 12px; padding: 8px 4px;
+            border: 2px solid; border-color: #fff #000 #000 #fff;
+            cursor: pointer; font-family: "MS Sans Serif", sans-serif; white-space: nowrap;
+            cursor: url('https://cur.cursors-4u.net/others/oth-6/oth609.cur'), pointer;
+        }
+        .retro-button:active { border-color: #000 #fff #fff #000; transform: translate(1px, 1px); }
+
+        /* --- RETRO EXTRAS --- */
+        .world-order-text {
+            text-align: center; color: #FFFF00; font-family: monospace;
+            text-shadow: 2px 2px #000; font-size: 16px; font-weight: bold;
+            animation: shake 0.5s infinite; /* SHAKING TEXT */
+            margin-bottom: 10px;
+        }
+
+        .hit-counter {
+            text-align: center; font-family: monospace; font-size: 12px;
+            color: red; background: black; border: 2px inset white;
+            width: fit-content; margin: 5px auto; padding: 2px 5px;
+            letter-spacing: 3px;
+        }
+
+        .badges-row {
+            display: flex; justify-content: center; gap: 5px; margin: 5px 0; flex-wrap: wrap;
+        }
+
+        /* --- SLIDER WINDOW --- */
+        .slider-content { padding: 10px; font-family: "MS Sans Serif", sans-serif; font-size: 13px; }
+        .slider-wrapper { display: flex; align-items: center; gap: 10px; margin: 10px 0; }
+        
+        input[type=range] { 
+            -webkit-appearance: none; width: 100%; background: transparent; 
+            cursor: url('https://cur.cursors-4u.net/others/oth-6/oth609.cur'), pointer;
+        }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; background: #000; border-bottom: 1px solid #fff; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 10px; background: #c0c0c0; border: 2px solid; border-color: #fff #000 #000 #fff; margin-top: -10px; cursor: pointer; }
+
+        .status-bar-row { display: flex; border-top: 2px solid #808080; padding-top: 2px; margin-top: 5px; gap: 2px; }
+        .status-item { border: 1px solid #808080; border-style: inset; padding: 2px 4px; background: #c0c0c0; font-size: 11px; }
+        .grow { flex-grow: 1; }
+
+        /* --- GALLERY --- */
+        .gallery-row { display: flex; justify-content: space-between; width: 100%; gap: 10px; }
+        .gallery-img { width: 48%; border: 2px solid #fff; background: #000; object-fit: cover; aspect-ratio: 1 / 1; }
+
+        /* --- FOOTER --- */
+        .footer-marquee { width: 100%; background: #fff; border: 2px solid #808080; border-style: inset; color: #000; font-family: monospace; padding: 4px 0; white-space: nowrap; overflow: hidden; font-size: 14px; }
+
+        /* --- WINAMP PLAYER --- */
+        .winamp-player {
+            position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+            width: 280px; background: #292929; border: 2px solid #5a5a5a;
+            z-index: 10000; padding: 5px; color: #00ff00; font-family: monospace;
+            box-shadow: 4px 4px 0 #000;
+        }
+        .winamp-header { background: #000080; color: white; padding: 2px; font-size: 10px; margin-bottom: 5px; cursor: pointer; }
+        .winamp-screen { background: #000; border: 1px inset #5a5a5a; padding: 5px; font-size: 10px; margin-bottom: 5px; }
+        .winamp-controls { display: flex; justify-content: space-between; }
+        .win-btn-small { background: #c0c0c0; border: 1px outset #fff; font-size: 9px; width: 30px; cursor: pointer; color: black; }
+
+        /* --- MOUSE TRAIL SPARKLE --- */
+        .sparkle {
+            position: absolute; width: 4px; height: 4px; background: white;
+            pointer-events: none; border-radius: 50%; z-index: 10000;
+            animation: fadeOut 1s forwards;
+        }
+        @keyframes fadeOut { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(3); opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <canvas id="matrix"></canvas>
+
+    <div class="desktop">
+        
+        <div class="logo-header">
+            <div class="mario-text">
+                <span class="l-blue">J</span>
+                <span class="l-yellow">E</span>
+                <span class="l-blue">W</span>
+                <span class="l-red">T</span>
+                <span class="l-green">A</span>
+                <span class="l-yellow">R</span>
+                <span class="l-blue">D</span>
+                <span class="l-red">I</span>
+                <span class="l-green">O</span>
+            </div>
+        </div>
+
+        <div style="background:yellow; border:1px solid black; width:100%; font-family:monospace; font-weight:bold; font-size:12px; margin-bottom:10px;">
+            <marquee scrollamount="10">🚧 UNDER CONSTRUCTION 🚧 DANGER 🚧 DO NOT ENTER 🚧</marquee>
+        </div>
+
+        <div class="win95-window">
+            <div class="title-bar">
+                <div class="title-text">✨ JEWTARDIO World Order</div>
+                <div class="window-controls">
+                    <button class="win-btn">_</button><button class="win-btn">□</button><button class="win-btn">X</button>
+                </div>
+            </div>
+            <div class="window-content-main">
+                
+                <img src="Jew2.jpg" class="main-hero-img" alt="Character">
+                
+                <div class="link-container">
+                    <div class="world-order-text">⚠ JEWTARDIO WORLD ORDER ⚠</div>
+                    
+                    <div class="btn-row">
+                        <a href="#" class="retro-button">Twitter</a>
+                        <a href="#" class="retro-button">Telegram</a>
+                    </div>
+                    <div class="btn-row">
+                        <a href="#" class="retro-button">Market</a>
+                        <a href="#" class="retro-button">Dex</a>
+                    </div>
+
+                    <div class="hit-counter">VISITORS: 666,420</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="win95-window">
+            <div class="title-bar">
+                <div class="title-text">✨ JEWTARDIO STATUS ✨</div>
+                <div class="window-controls">
+                    <button class="win-btn">_</button><button class="win-btn">□</button><button class="win-btn">X</button>
+                </div>
+            </div>
+            <div class="slider-content">
+                <div style="margin-bottom:5px;">How Jewtardio are you?</div>
+                <div class="slider-wrapper">
+                    <span>Low</span>
+                    <input type="range" min="1" max="100" value="50">
+                    <span>High</span>
+                </div>
+                
+                <div class="status-bar-row">
+                    <div class="status-item grow">Press F1 for help</div>
+                    <div class="status-item">Slide 1</div>
+                    <div class="status-item">CPU: 99%</div>
+                    <div class="status-item">MICA</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="gallery-row">
+            <img src="Jew1.jpg" class="gallery-img" alt="Meme 1">
+            <img src="Jew2.jpg" class="gallery-img" alt="Whale Meme">
+        </div>
+
+      </br>
+        <div class="win95-window">
+            <div class="title-bar">
+                <div class="title-text">✨ JEWTARDIO System ✨</div>
+                <div class="window-controls"><button class="win-btn">X</button></div>
+            </div>
+            <div class="footer-marquee">
+                <marquee scrollamount="6"> JEWTARDIO CA </marquee>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="winamp-player">
+        <div class="winamp-header">WINAMP</div>
+        <div class="winamp-screen">
+            <marquee scrollamount="4">1. DARUDE - SANDSTORM (MP3) *** 128kbps ***</marquee>
+        </div>
+        <div class="winamp-controls">
+            <button class="win-btn-small">Prev</button>
+            <button class="win-btn-small">Play</button>
+            <button class="win-btn-small">Pause</button>
+            <button class="win-btn-small">Stop</button>
+            <button class="win-btn-small">Next</button>
+        </div>
+    </div>
+
+    <script>
+        // MATRIX RAIN
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas); resizeCanvas();
+
+        const
